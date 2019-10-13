@@ -1,0 +1,5 @@
+# algorithms
+
+## sorting
+- mergesort
+- quicksort
