@@ -6,6 +6,13 @@ function randomArr(size, min, max) {
     return arr;
 }
 
+function swap(arr, findex, sindex) {
+    let temp = arr[sindex];
+    arr[sindex] = arr[findex];
+    arr[findex] = temp;
+}
+
 module.exports  = {
-    randomIntArr: randomArr
+    randomIntArr: randomArr,
+    swap: swap
 }
