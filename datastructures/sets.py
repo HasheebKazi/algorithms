@@ -1,62 +1,47 @@
-# adt is just a mathematical model that describes some data
-# what is the data
-# how is the data stored 
-# how do individual elements relate to each other and the whole
-# what operations do we need to perform on the data
+# a set is an un ordered collection of things
+# its a well defined collection and thus you must specify the things that belong in a set
+# all other things are exclueded from the set
+# a category of well defined things, as long as you can define the category somehow (rule, definition, enumeration, relationship) you can have a set of things
+# any given object can belong to any number of sets 
 
-import ctypes
-
-class Array():
-    # Creates an array with size elements.
-    def __init__( self, size ):
-        assert size > 0, "Array size must be > 0"
-        self._size = size
-        # Create the array structure using the ctypes module.
-        PyArrayType = ctypes.py_object * size
-        self._elements = PyArrayType()
-        # Initialize each element.
-        self.clear( None )
-
-    # Returns the size of the array.
-    def __len__( self ):
-        return self._size
+# understand and implement sets, then read the python docs
+# a set also stores unique value ( each thing only appear once in a set (it belongs or it doesnt, there can't be multiples of the same thing))
+class set_():
+    def __init__(self, iterable):
+        self.length = 0;
+        self.collection = [];
+        for x in iterable:
+            self.collection.append(x);
+            self.length = self.length + 1;
     
-    # Gets the contents of the index element.
-    def __getitem__( self, index ):
-        assert index >= 0 and index < len(self), "Array subscript out of range"
-        return self._elements[ index ]
+    def __len__(self, value):
+        return self.length;
     
-    # Puts the value in the array element at index position.
-    def __setitem__( self, index, value ):
-        assert index >= 0 and index < len(self), "Array subscript out of range"
-        self._elements[ index ] = value
+    def contains(self, element):
+        pass
+
+    def add(self, element):
+        pass
+
+    def remove(self, element):
+        pass
+
+    def equals(self, element):
+        pass
+
+    def isSubsetOf(self, setB):
+        pass
+
+    def union(self, sestB):
+        pass
+
+    def intersect(self, setB):
+        pass
+
+    def differenc(self, setB):
+        pass
+
+    def iterator(self):
+        pass
     
-    # Clears the array by setting each element to the given value.
-    def clear( self, value ):
-        for i in range( len(self) ):
-            self._elements[i] = value
-    
-    # Returns the array's iterator for traversing the elements.
-    def __iter__( self ):
-        return _ArrayIterator( self._elements )
 
-class _ArrayIterator():
-    def __init__( self, theArray ):
-        self._arrayRef = theArray
-        self._curNdx = 0
-
-    def __iter__( self ):
-        return self
-
-    def __next__( self ):
-        if self._curNdx < len( self._arrayRef ) :
-            entry = self._arrayRef[ self._curNdx ]
-            self._curNdx += 1
-            return entry
-        else :
-            raise StopIteration
-
-
-array = Array(20);
-array[10] = [1,2,3,4,5,6];
-print(array[10]);
