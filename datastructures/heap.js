@@ -8,11 +8,11 @@ class MaxHeap {
 
     // naive implementation (nlogn)
     createMaxHeap(arr) {
-        let heap = [];
-        heap.push(arr[0]);
+        let heap = Array(arr.length).fill(0);
+        heap[0] = arr[0];
 
         for (let index = 1; index < arr.length; index++) {
-            heap.push(arr[index]);
+            heap[index] = arr[index];
             this.maxHeapify(heap, index);
         }
 
