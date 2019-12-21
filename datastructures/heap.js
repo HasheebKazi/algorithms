@@ -6,33 +6,40 @@ class MaxHeap {
         this.size = arr.length;
     }
 
+    // naive implementation (nlogn)
     createMaxHeap(arr) {
-        return arr;
+        let heap = [];
+        heap.push(arr[0]);
+
+        for (let index = 1; index < arr.length; index++) {
+            heap.push(arr[index]);
+            this.maxHeapify(heap, index);
+        }
+
+        return heap;
     }
 
-    maxHeapify(index) {
+    // logn complexity
+    maxHeapify(arr, index) {
         // takes an element at an index and bubbles it up
         let parent = Math.ceil(index/2) - 1;
         let temp = null;
         while (parent >= 0) {
             assert(parent >= 0, 'parent is negative abort');
-            // if child is greater than parent swap them 
-            console.log('i', index);
-            console.log('p', parent);
-
-            parent = Math.ceil(index/2) - 1;
-            if (this.heap[index] > this.heap[parent]) {
-                temp = this.heap[index];
-                this.heap[index] = this.heap[parent];
-                this.heap[parent] = temp;
+            // if child is greater than parent swap them and update the index
+            if (arr[index] > arr[parent]) {
+                temp = arr[index];
+                arr[index] = arr[parent];
+                arr[parent] = temp;
                 index = parent;
             } else {
                 break;
             }
+            parent = Math.ceil(index/2) - 1;
         }
     }
-
-    poll() {
+    
+    peak() {
         if (this.heap.length > 0) {
             return this.heap[0];
         } else {
@@ -44,11 +51,13 @@ class MaxHeap {
 
     }
 
-    removeRoot() {
+    poll() {
 
     }
 
-    
+    delete() {
+
+    }
     
     toString() {
         console.log('heap: ', this.heap);
