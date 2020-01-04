@@ -6,4 +6,4 @@
 - heapsort
 
 ## datastructures
-- binary heaps
+- binary heap 
