@@ -1,10 +1,15 @@
-const UndirectedGraph = require('./graph');
+const { Graph } = require('./graph');
 
-const graph1 = new UndirectedGraph.UndirectedGraph({
-    'a': ['b','c'],
-    'b': ['a'],
-    'c': ['d','a'],
-    'd': ['c']
-});
+const graph = new Graph();
 
-console.log(graph1);
+const [first] = graph.addEdge(1, 2);
+graph.addEdge(1, 3);
+graph.addEdge(1, 4);
+graph.addEdge(5, 2);
+graph.addEdge(6, 3);
+graph.addEdge(7, 3);
+graph.addEdge(8, 4);
+graph.addEdge(9, 5);
+graph.addEdge(10, 6);
+
+console.log(graph);
