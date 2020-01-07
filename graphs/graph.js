@@ -31,8 +31,11 @@ class Node {
     }
 
     // O(1)
-    getAdjacents(node) {
-        return this.adjacents;
+    getAdjacents() {
+        // return this.adjacents;
+
+        // 0(1) for testing purposes
+        return [...this.adjacents];
     }
 
     // O(1)
