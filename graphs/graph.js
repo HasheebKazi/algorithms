@@ -53,6 +53,11 @@ class Graph {
     }
 
     // O(1)
+    getVertecies() {
+        return this.nodes;
+    }
+
+    // O(1)
     addEdge(sourceIdentifier, destinationIdentifier) {
         const sourceNode = this.addOrGetVertex(sourceIdentifier);
         const destinationNode = this.addOrGetVertex(destinationIdentifier);
