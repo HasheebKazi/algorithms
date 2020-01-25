@@ -17,17 +17,24 @@ class Node {
     }
 
     // O(1) 
-    addAdjacent(node) {
-        this.adjacents.push(node);
+    addAdjacent(destinationNode, weight = 0) {
+        const edge = new WEdge(destinationNode, weight);
+        this.adjacents.push(edge);
     }
 
     // O(|E|) 
     removeAdjacent(node) {
-        const index = this.adjacents.indexOf(node);
-        if (index > -1) {
-            this.adjacents.splice(index, 1);
-            return node;
-        }
+        // given a node remove the related edge
+        const newAdjacents = this.addAdjacent.filter(edge => {
+            if (edge.getDestination !== node) {
+                return true;
+            } else {
+                return false
+            }
+        });
+
+        this.adjacents = newAdjacents;
+        return node;
     }
 
     // O(1)
@@ -39,10 +46,25 @@ class Node {
     }
 
     // O(1)
-    isAdjacent(node) {
-        return this.adjacents.indexOf(node) > -1;
+    isAdjacent(edge) { // edge doesnt really make sense but we are storing edges
+        return this.adjacents.indexOf(edge) > -1;
     }
 
+}
+
+class WEdge {
+    constructor(destinationNode, weight = 0) {
+        this.destinationNode =destinationNode;
+        this.weight = weight;
+    }
+
+    getDestination() {
+        return this.destinationNode;
+    }
+
+    getWeight() {
+        return this.weight;
+    }
 }
 
 class Graph {
@@ -55,20 +77,6 @@ class Graph {
     // O(1)
     getVertecies() {
         return this.nodes;
-    }
-
-    // O(1)
-    addEdge(sourceIdentifier, destinationIdentifier) {
-        const sourceNode = this.addOrGetVertex(sourceIdentifier);
-        const destinationNode = this.addOrGetVertex(destinationIdentifier);
-
-        sourceNode.addAdjacent(destinationNode);
-
-        if (this.edgeDirection === Graph.UNDIRECTED) {
-            destinationNode.addAdjacent(sourceNode);
-        }
-
-        return [sourceNode, destinationNode];
     }
 
     // O(1)
@@ -92,6 +100,22 @@ class Graph {
         }
         return this.nodes.delete(identifier);
     }
+
+        // O(1)
+        addEdge(sourceIdentifier, destinationIdentifier, weight = 0) {
+            const sourceNode = this.addOrGetVertex(sourceIdentifier);
+            const destinationNode = this.addOrGetVertex(destinationIdentifier);
+            
+            // this lets me add a weight to each edge
+            // sourceNode.addAdjacent(destinationNode);
+            sourceNode.addAdjacent(sourceNode, weight);
+            if (this.edgeDirection === Graph.UNDIRECTED) {
+                // destinationNode.addAdjacent(sourceNode);
+                destinationNode.addAdjacent(destinationNode, weight);
+            }
+    
+            return [sourceNode, destinationNode];
+        }
 
     // O(|E|)
     removeEdge(sourceIdentifier, destinationIdentifier) {

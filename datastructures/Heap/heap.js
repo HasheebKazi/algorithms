@@ -95,7 +95,7 @@ class Heap {
     }
 
     insert() {
-
+        // implement insert
     }
 
     poll() {
@@ -103,7 +103,7 @@ class Heap {
     }
 
     delete() {
-
+        // implement delete
     }
     
     toString() {
