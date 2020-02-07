@@ -40,7 +40,7 @@ exports.dfs = (graph) => {
     // in dfs parent keeps track of whether or not we've seen a vertex and helps us classify edges
     const parent = { };
     const dfsOrder = [ ];
-    const treeEdges = [ ];
+    // const treeEdges = [ ];
 
     // get all vertecies from the graph: which is a map of ('vertex_indentifier' => object('representing the node'))
     const vertecies = graph.getVertecies();
@@ -53,7 +53,7 @@ exports.dfs = (graph) => {
             if (!parent[vertex['identifier']]) {
                 parent[vertex['identifier']] = currentNode['identifier'];
                 dfsOrder.push(vertex['identifier']);
-                treeEdges.push([currentNode['identifier'], vertex['identifier']]);
+                // treeEdges.push([currentNode['identifier'], vertex['identifier']]);
                 dfsVisit(vertex);
             } else {
                 // if the edge isn't a tree edge
@@ -69,9 +69,6 @@ exports.dfs = (graph) => {
             dfsVisit(vertecies.get(vertexIdentifier));
         }
     }
-
-
-
     return [parent, dfsOrder, treeEdges];
 }
 
