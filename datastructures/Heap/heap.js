@@ -10,9 +10,9 @@ class Heap {
         if (type === MIN) {
             this.heap = this.createMinHeap(iterableObject);
         } else {
-            this.heap = this.createMinHeap(iterableObject);
+            this.heap = this.createMaxHeap(iterableObject);
         }
-        // this.type = type;
+        this.type = type;
         // this.type = type;
     }
 
@@ -131,9 +131,11 @@ class Heap {
         }
     }
 
-    insert() {
+    insert(value) {
         // implement insert
         // add the element to the end of the array and then min/max heapify it
+        this.heap.push(value);
+        this.minHeapify(this.heap.length - 1, this.heap);
     }
     
     toString() {
