@@ -7,3 +7,6 @@
 
 ## datastructures
 - binary heap 
+- binary search tree
+- sets
+- hash table with fixed arr
