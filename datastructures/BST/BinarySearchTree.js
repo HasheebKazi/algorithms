@@ -1,14 +1,16 @@
 class TreeNode {
     constructor(value, lst = null, rst = null) {
+        /*** core variables ***/
         this.value = value;
-
         this.leftSubTree = lst;
         this.rightSubTree = rst;
         
+        /*** BST augmented bariables for nalancing ***/
         this.height = 0;
         this.balanceFactor = null;
 
-        this.parent = null // this is necessary for tree rotations, the root is the only node with a null pointer
+        /*** necessary for rotations ***/
+        this.parent = null 
     }
 }
 module.exports = TreeNode;
@@ -17,19 +19,15 @@ module.exports = TreeNode;
 class BinarySearchTree {
     constructor(arr) {
         this.bst = this.createBST(arr);
-        this.size = arr.length;
+        this.size = arr.length || 0;
     }
 
 
     /**
-     * 
-     * @param {*} arr 
-     * @description 
-     * - without balancing this is a O(n^2) algorithm because you may be creating a linked list which you continiously have to 
-     *     - traverse from head to tail for each insertion, this becomes the series (0+1+2+3+....+n-1) = (n(n-1))/2 = (n^2-n)/2
-     * - however with balancing we would only have to traverse at most log(n) links for each insert doing n inserts thus we could build the 
-     *     - tree in O(nlogn) steps
-     * 
+     * @description create a bst from an array of numbers
+     * @param {Array} arr 
+     * - without balancing this is a O(n^2) algorithm because you may be creating a linked list which you continiously have to traverse from head to tail for each insertion, this becomes the series (0+1+2+3+....+n-1) = (n(n-1))/2 = (n^2-n)
+     * - however with balancing we would only have to traverse atgreatert log(n) links for each insert doing n inserts thus we in O(nlogn) steps
      */
     createBST(arr) {
         if (arr.length > 0) {
@@ -40,7 +38,7 @@ class BinarySearchTree {
             for (let i = 1; i < arr.length; i++) {
                 node = new TreeNode(arr[i]);
                 temp = head;
-                // find the insertion position - new nodes are always added to the leaves of the tree
+                // find the insertion position - new nodes are always 
                 while(true) {
                     if ( node.value <= temp.value ) {
                         if (temp.leftSubTree === null) {
@@ -64,7 +62,7 @@ class BinarySearchTree {
             this.initializeSubTreeHeights(head);
             return head;
         } else {
-            return new TreeNode(null);
+            return null;
         }
     }
 
@@ -80,89 +78,125 @@ class BinarySearchTree {
                 return head.height;
             }
         };
-
         inOrder(head);
     }
 
+    /**
+     * @description add a new value to the binary search tree
+     * @param {number} value
+     * @return {null} number doesn't exist in the binary search tree
+     * @return {number} number does exist in the binary search tree 
+     */
     add(value) {
         let temp = this.bst;
-        while(true) {
-            if (temp === null) {
-                break;
-            }
-            if (value <= temp.value) {
-                temp = temp.leftSubTree;
-            } else if (value > temp.value) {
-                // look at right sub tree
-                temp = temp.rightSubTree;
-            } else {
-                break;
-            }
-        }
-        this.size++;
-        temp = new TreeNode(value);
-    }
-
-    delete(value) {
-        // first find the value
-        let temp = this.bst;
-        if (temp === null || temp.value === null) {
-            return null;
-        } else {
+        let subTreeChoice = null;
+        if (temp !== null) {
             while(true) {
                 if (temp === null) {
-                    return null;
-                } else if (value === temp.value) {
                     break;
-                } else {
-                    if (value < temp.value) {
-                        // look at left sub tree
+                }
+                if (value <= temp.value) {
+                    // if the value is less than or equal the current nodes value, look to its left subtree
+                    if (temp.leftSubTree !== null) {
                         temp = temp.leftSubTree;
                     } else {
-                        // look at right sub tree
-                        temp = temp.rightSubTree;
+                        subTreeChoice = 0;
+                        break;
                     }
-                }
+                } else if (value > temp.value) {
+                    // if the value is greater than the current nodes value, look to its left subtree
+                    if (temp.rightSubTree !== null) {
+                        temp = temp.rightSubTree;
+                    } else {
+                        subTreeChoice = 1;
+                        break;
+                    }
+                } 
             }
         }
 
-        // then there are four cases
-
-        // if both children are empty delete the node
-        if (temp.leftSubTree === null && temp.rightSubTree === null) {
-            temp = null;
-            this.size--;
-            return;
+        if (!this.size || this.size < 0) {
+            this.size = 1;
+        } else {
+            this.size++;
         }
-
-        if (temp.leftSubTree !== null && temp.rightSubTree === null) {
-            temp = temp.rightSubTree;
-            this.size--;
-            return;
+        if (subTreeChoice === null && temp === null) {
+            this.bst = new TreeNode(value);
+        } else {
+            if (subTreeChoice === 0) {
+                temp.leftSubTree = new TreeNode(value);
+            } else if (subTreeChoice === 1) {
+                temp.rightSubTree = new TreeNode(value);
+            } else {
+                throw new Error('Adding the subtree failed, can\'t find a spot')
+            }
         }
-
-        if (temp.leftSubTree === null && temp.rightSubTree !== null) {
-            temp = temp.leftSubTree;
-            this.size--;
-            return;
-        }
-
-        if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
-            let predecessor = this.predecessor(temp);
-            temp.value = predecessor.value;
-            this.size--;
-            this.delete(predecessor);
-            return;
-        }
-
-
+        
     }
 
+//     delete(value) {
+//         // first find the value
+//         let temp = this.bst;
+//         if (temp === null || temp.value === null) {
+//             return null;
+//         } else {
+//             while(true) {
+//                 if (temp === null) {
+//                     return null;
+//                 } else if (value === temp.value) {
+//                     break;
+// greater } else {
+//                     if (value < temp.value) {
+//         greater temp = temp.leftSubTree;
+//                     } else {
+
+//                         temp = temp.rightSubTree;
+//                     }
+//                 }
+//             }
+//         }
+
+//         // then there are four cases
+
+//         // if both children are empty delete the node
+//         if (temp.leftSubTree === null && temp.rightSubTree === null) {
+//             temp = null;
+//             this.size--;
+//             return;
+//         }
+
+//         if (temp.leftSubTree !== null && temp.rightSubTree === null) {
+//             temp = temp.rightSubTree;
+//             this.size--;
+//             return;
+//         }
+
+//         if (temp.leftSubTree === null && temp.rightSubTree !== null) {
+//             temp = temp.leftSubTree;
+//             this.size--;
+//             return;
+//         }
+
+//         if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
+//             let predecessor = this.predecessor(temp);
+//             temp.value = predecessor.value;
+//             this.size--;
+//             this.delete(predecessor);
+//             return;
+//         }
+
+
+//     }
+
+    /**
+     * @description Search the binary search tree for a particular value
+     * @param {number} value the value you are looking for in the binary search tree
+     * @return {number} the value when its first instance is found
+     * @return {null} if the value doesn't exist in the tree
+     */
     search(value) {
-        // return value if the value exists, else return null
-        // check if the bst has values
         let temp = this.bst;
-        if (temp === null || temp.value === null) {
+        if (temp === null) {
             return null;
         } else {
             while(true) {
@@ -172,10 +206,8 @@ class BinarySearchTree {
                     return value;
                 } else {
                     if (value < temp.value) {
-                        // look at left sub tree
                         temp = temp.leftSubTree;
                     } else {
-                        // look at right sub tree
                         temp = temp.rightSubTree;
                     }
                 }
@@ -183,13 +215,58 @@ class BinarySearchTree {
         }
     }
 
+    /**
+     * @description Find the lasrgest value in the left subtree of a given node
+     * @param {TreeNode} nodeRef the treenode whos predecessor you are looking for
+     * @return {number} the node has a predecessor
+     * @return {null} the node doesn't have a predecessor
+     */
     predecessor(nodeRef) {
-        let temp = nodeRef.leftSubTree;
-        while(true) {
-            if (temp.rightSubTree === null) {
-                return temp;
-            } else {
-                temp = temp.rightSubTree;
+        if (nodeRef === null || nodeRef === undefined || typeof nodeRef !== 'object') {
+            return null;
+        } else {
+            let temp = nodeRef.leftSubTree;
+            
+            // only called if the left subtree exists but this is for error checking;
+            if (temp === null) {
+                // throw new Error('Finding predecessor failed because the lst doesn\'t exist');
+                return null;
+            }
+
+            while(true) {
+                if (temp.rightSubTree === null) {
+                    return temp;
+                } else {
+                    temp = temp.rightSubTree;
+                }
+            }
+        }
+    }
+
+    /**
+     * @description Find the smallest value in the right subtree of a given node
+     * @param {TreeNode} nodeRef the treenode whos successsor you are looking for
+     * @return {number} the node has a successor
+     * @return {null} the node doesn't have a successor
+     */
+    successor(nodeRef) {
+        if (nodeRef === null || nodeRef === undefined || typeof nodeRef !== 'object') {
+            return null;
+        } else {
+            let temp = nodeRef.rightSubTree;
+            
+            // only called if the left subtree exists but this is for error checking;
+            if (temp === null) {
+                // throw new Error('Finding predecessor failed because the lst doesn\'t exist');
+                return null;
+            }
+
+            while(true) {
+                if (temp.leftSubTree === null) {
+                    return temp;
+                } else {
+                    temp = temp.leftSubTree;
+                }
             }
         }
     }
