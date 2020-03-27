@@ -22,7 +22,6 @@ class BinarySearchTree {
         this.size = arr.length || 0;
     }
 
-
     /**
      * @description create a bst from an array of numbers
      * @param {Array} arr 
@@ -134,59 +133,84 @@ class BinarySearchTree {
         
     }
 
-//     delete(value) {
-//         // first find the value
-//         let temp = this.bst;
-//         if (temp === null || temp.value === null) {
-//             return null;
-//         } else {
-//             while(true) {
-//                 if (temp === null) {
-//                     return null;
-//                 } else if (value === temp.value) {
-//                     break;
-// greater } else {
-//                     if (value < temp.value) {
-//         greater temp = temp.leftSubTree;
-//                     } else {
+    delete(value) {
 
-//                         temp = temp.rightSubTree;
-//                     }
-//                 }
-//             }
-//         }
+        /** first find and delete the value **/
+        /*** the pointer should point to the subtree as a whole or the parent of the node we want to delete */
+        let temp = this.bst;
+        let parent = this.bst
+        let subTreeChoice = null;
+        if (temp === null) {
+            /*** the subtree is empty */
+            return null;
+        } else {
+            while(true) {
+                if (temp === null) {
+                    /*** the value doesn't exist in our tree */
+                    return null;
+                } else if (temp.value === value) {
+                    break;
+                } else {
+                    if (value < temp.value) {
+                        parent = temp;
+                        temp = temp.leftSubTree;
+                        subTreeChoice = 0;
+                    } else {
+                        parent = temp;
+                        temp = temp.rightSubTree;
+                        subTreeChoice = 1;
+                    }
+                }
+            }
+        }
 
-//         // then there are four cases
+        /** Four cases */
 
-//         // if both children are empty delete the node
-//         if (temp.leftSubTree === null && temp.rightSubTree === null) {
-//             temp = null;
-//             this.size--;
-//             return;
-//         }
+        /*** Both subtrees of the deleted node are null */
+        if (temp.leftSubTree === null && temp.rightSubTree === null) {
+            if (subTreeChoice === 0) {
+                parent.leftSubTree = null;
+            } else {
+                parent.rightSubTree = null;
+            }
+            this.size--;
+            return;
+        }
+        /*** the rightsubtree is null, the leftsubtree is valid */
+        if (temp.leftSubTree !== null && temp.rightSubTree === null) {
+            if (subTreeChoice === 0) {
+                parent.leftSubTree = temp.leftSubTree;
+            } else {
+                parent.rightSubTree = temp.leftSubTree;
+            }
 
-//         if (temp.leftSubTree !== null && temp.rightSubTree === null) {
-//             temp = temp.rightSubTree;
-//             this.size--;
-//             return;
-//         }
+            this.size--;
+            return;
+        }
+        /*** the leftsubtree is null, the rightsubtree is valid */
+        if (temp.leftSubTree === null && temp.rightSubTree !== null) {
+            if (subTreeChoice === 0) {
+                parent.leftSubTree = temp.rightSubTree;
+            } else {
+                parent.rightSubTree = temp.rightSubTree;
+            }
 
-//         if (temp.leftSubTree === null && temp.rightSubTree !== null) {
-//             temp = temp.leftSubTree;
-//             this.size--;
-//             return;
-//         }
+            this.size--;
+            return;
+        }
 
-//         if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
-//             let predecessor = this.predecessor(temp);
-//             temp.value = predecessor.value;
-//             this.size--;
-//             this.delete(predecessor);
-//             return;
-//         }
+        /*** the left and right subtrees are not null */
+        if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
+            let predecessor = this.predecessor(temp);
+            let tempValue = predecessor.value;
+            this.delete(predecessor.value);
+            temp.value = tempValue
+            this.size--;
+            return;
+        }
 
 
-//     }
+    }
 
     /**
      * @description Search the binary search tree for a particular value
