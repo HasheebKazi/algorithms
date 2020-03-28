@@ -18,66 +18,26 @@ module.exports = TreeNode;
 
 class BinarySearchTree {
     constructor(arr) {
-        this.bst = this.createBST(arr);
+        this.bst = null;
         this.size = arr.length || 0;
+        this.createBST(arr);
     }
 
     /**
      * @description create a bst from an array of numbers
-     * @param {Array} arr 
+     * @param {Array} arr contains the initial valuse that will be inserted into the BST
      * - without balancing this is a O(n^2) algorithm because you may be creating a linked list which you continiously have to traverse from head to tail for each insertion, this becomes the series (0+1+2+3+....+n-1) = (n(n-1))/2 = (n^2-n)
      * - however with balancing we would only have to traverse atgreatert log(n) links for each insert doing n inserts thus we in O(nlogn) steps
      */
     createBST(arr) {
-        if (arr.length > 0) {
-            const head = new TreeNode(arr[0]);
-            head.height = 0;
-            let node = null;
-            let temp = head;
-            for (let i = 1; i < arr.length; i++) {
-                node = new TreeNode(arr[i]);
-                temp = head;
-                // find the insertion position - new nodes are always 
-                while(true) {
-                    if ( node.value <= temp.value ) {
-                        if (temp.leftSubTree === null) {
-                            temp.leftSubTree = node;
-                            break;
-                        } else {
-                            temp = temp.leftSubTree;
-                        }
-                    } else if ( node.value > temp.value ) {
-                        if (temp.rightSubTree === null) {
-                            temp.rightSubTree = node;
-                            break;
-                        } else {
-                            temp = temp.rightSubTree;
-                        }
-                    } else {
-                        throw new Error('Something went wrong: the element is neither less than, equal to or greater than ');
-                    }
-                }
-            }
-            this.initializeSubTreeHeights(head);
-            return head;
+        if (arr.length === 0 || arr === null || arr === undefined) {
+            this.bst = null;
+            this.size = 0;
         } else {
-            return null;
+            arr.forEach((value, index) => {
+                this.add(value);
+            });
         }
-    }
-
-    initializeSubTreeHeights(head) {
-        const inOrder = (head) => {
-            if (head === null || head === undefined) {
-                return - 1;
-            } else {
-                let leftSubTreeHeight = inOrder(head.leftSubTree);
-                let rightSubTreeHeight = inOrder(head.rightSubTree);
-                head.height = Math.max(leftSubTreeHeight, rightSubTreeHeight) + 1;
-                head.balanceFactor = (leftSubTreeHeight - rightSubTreeHeight);
-                return head.height;
-            }
-        };
-        inOrder(head);
     }
 
     /**
@@ -89,7 +49,8 @@ class BinarySearchTree {
     add(value) {
         let temp = this.bst;
         let subTreeChoice = null;
-        if (temp !== null) {
+        if (temp !== null && temp !== undefined) {
+            /**** find insertion position, node + left or right child */
             while(true) {
                 if (temp === null) {
                     break;
@@ -114,20 +75,54 @@ class BinarySearchTree {
             }
         }
 
-        if (!this.size || this.size < 0) {
-            this.size = 1;
-        } else {
-            this.size++;
-        }
-        if (subTreeChoice === null && temp === null) {
+        if (subTreeChoice === null && temp === null || temp === undefined) {
             this.bst = new TreeNode(value);
+            this.bst.parent = null;
+            this.size = 1;
         } else {
             if (subTreeChoice === 0) {
                 temp.leftSubTree = new TreeNode(value);
-            } else if (subTreeChoice === 1) {
-                temp.rightSubTree = new TreeNode(value);
+                temp.leftSubTree.parent = temp;
             } else {
-                throw new Error('Adding the subtree failed, can\'t find a spot')
+                temp.rightSubTree = new TreeNode(value);
+                temp.rightSubTree.parent = temp;
+            } 
+            this.size++;
+        }
+
+        /**** update tree with new heights */
+        let climber = null;
+        if (subTreeChoice === 0) {
+            climber = temp.leftSubTree;
+        } else if (subTreeChoice === 1) {
+            climber = temp.rightSubTree;
+        } else {
+            climber = this.bst;
+            climber.height = 0;
+            return;
+        }
+
+        /**** climb up the tree and update heights as necessary */
+        climber.height = 0;
+        let parentLeftSubTree = null;
+        let parentRightSubTree = null;
+        let oldHeight = null;
+        while(climber.parent !== null) {
+            climber = climber.parent;
+            if (climber.leftSubTree) {
+                parentLeftSubTree = climber.leftSubTree.height;
+            } else {
+                parentLeftSubTree = -1;
+            }
+            if (climber.rightSubTree) {
+                parentRightSubTree = climber.rightSubTree.height;
+            } else {
+                parentRightSubTree = -1;
+            }
+            oldHeight = climber.height;
+            climber.height = Math.max(parentLeftSubTree, parentRightSubTree) + 1;
+            if (oldHeight === climber.height) {
+                return;
             }
         }
         
@@ -135,11 +130,12 @@ class BinarySearchTree {
 
     delete(value) {
 
-        /** first find and delete the value **/
-        /*** the pointer should point to the subtree as a whole or the parent of the node we want to delete */
+        /*** first find and delete the value */
+        /**** the pointer should point to the subtree as a whole or the parent of the node we want to delete */
         let temp = this.bst;
-        let parent = this.bst
+        let parent = this.bst;
         let subTreeChoice = null;
+        let updateCase = 0;
         if (temp === null) {
             /*** the subtree is empty */
             return null;
@@ -164,52 +160,100 @@ class BinarySearchTree {
             }
         }
 
-        /** Four cases */
 
-        /*** Both subtrees of the deleted node are null */
+        /** Four cases */
         if (temp.leftSubTree === null && temp.rightSubTree === null) {
-            if (subTreeChoice === 0) {
-                parent.leftSubTree = null;
+            /*** Both subtrees of the deleted node are null */
+            if (this.bst.height === 0) {
+                this.bst = null;
+                return;
             } else {
-                parent.rightSubTree = null;
+                if (subTreeChoice === 0) {
+                    parent.leftSubTree = null;
+                } else {
+                    parent.rightSubTree = null;
+                }
             }
-            this.size--;
-            return;
-        }
-        /*** the rightsubtree is null, the leftsubtree is valid */
-        if (temp.leftSubTree !== null && temp.rightSubTree === null) {
+            updateCase = 1;
+        } else if (temp.leftSubTree !== null && temp.rightSubTree === null) {
+            /*** the rightsubtree is null, the leftsubtree is valid */
             if (subTreeChoice === 0) {
                 parent.leftSubTree = temp.leftSubTree;
             } else {
                 parent.rightSubTree = temp.leftSubTree;
             }
-
-            this.size--;
-            return;
-        }
-        /*** the leftsubtree is null, the rightsubtree is valid */
-        if (temp.leftSubTree === null && temp.rightSubTree !== null) {
+            updateCase = 2;
+        } else if (temp.leftSubTree === null && temp.rightSubTree !== null) {
+            /*** the leftsubtree is null, the rightsubtree is valid */
             if (subTreeChoice === 0) {
                 parent.leftSubTree = temp.rightSubTree;
             } else {
                 parent.rightSubTree = temp.rightSubTree;
             }
-
-            this.size--;
-            return;
-        }
-
-        /*** the left and right subtrees are not null */
-        if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
+            updateCase = 3;
+        } else if (temp.leftSubTree !== null && temp.rightSubTree !== null) {
+            updateCase = 4;
+            /*** the left and right subtrees are not null */
             let predecessor = this.predecessor(temp);
             let tempValue = predecessor.value;
             this.delete(predecessor.value);
             temp.value = tempValue
-            this.size--;
-            return;
         }
+        this.size--;
 
+        /** NOTE: WORKS CORRECTLY UNTIL HERE
+         * - HEIGHT ADJUSTMENT HASN'T BEEN THOROUGHLY TESTED FOR DELETES **/
 
+        if (updateCase !== 4) {
+            /**** fix heights after deleting a node */
+            /**** update tree with new heights */
+            let climber = null;
+            if (parent.leftSubTree === null && parent.rightSubTree === null) {
+                climber = parent;
+            } else {
+                if (subTreeChoice === 0) {
+                    climber = parent.leftSubTree;
+                } else if (subTreeChoice === 1) {
+                    climber = parent.rightSubTree;
+                } else {
+                    climber = this.bst;
+                    climber.height = 0;
+                    return;
+                }
+            }
+    
+            /**** climb up the tree and update heights as necessary */
+            if (updateCase === 1) {
+                climber.height = 0;
+            } else if (updateCase === 2 || updateCase === 3) {
+                if (subTreeChoice === 0) {
+                    climber.height = parent.leftSubTree + 1;
+                } else {
+                    climber.height = parent.rightSubTree + 1;
+                }
+            }
+            let parentLeftSubTree = null;
+            let parentRightSubTree = null;
+            let oldHeight = null;
+            while(climber.parent !== null) {
+                climber = climber.parent;
+                if (climber.leftSubTree) {
+                    parentLeftSubTree = climber.leftSubTree.height;
+                } else {
+                    parentLeftSubTree = -1;
+                }
+                if (climber.rightSubTree) {
+                    parentRightSubTree = climber.rightSubTree.height;
+                } else {
+                    parentRightSubTree = -1;
+                }
+                oldHeight = climber.height;
+                climber.height = Math.max(parentLeftSubTree, parentRightSubTree) + 1;
+                if (oldHeight === climber.height) {
+                    return;
+                }
+            }
+        }
     }
 
     /**
