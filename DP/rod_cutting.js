@@ -1,7 +1,6 @@
 // naive recurisive algorithm
 function cut_rod(size, price_table) {
     let memoArr = Array(size).fill(null);
-    let global_max = -1;
     function cut(rod_size) {
         if (memoArr[rod_size - 1]) {
             return memoArr[rod_size - 1];
@@ -18,16 +17,14 @@ function cut_rod(size, price_table) {
                 }
                 // console.log(arr, arr.length, rod_size);
                 currMax = Math.max(...[...arr, price_table[rod_size - 1]]);
-                if (currMax > global_max) {
-                    global_max = currMax;
-                }
                 memoArr[rod_size - 1] = currMax;
                 return currMax;
             }
         }
     }
     cut(size);
-    return global_max;
+    console.log(memoArr);
+    return memoArr[size - 1];
 }
 
 
